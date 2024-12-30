@@ -148,15 +148,23 @@
     <div id="app" class="container">
         <!-- <h2 class="mb-4">Math Quiz</h1> -->
 
-        <div v-if="!started" class="setup-container">
+        <div v-if="screenMode==0" class="setup-container">
             <h2 class="mb-3">Thiết lập trò chơi</h2>
+            <div>
+                <label>Số lượng câu hỏi:</label>
+                <input type="number" v-model.number="totalQuestions" class="form-control" step="1" min="1">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Thời gian trả lời mỗi câu (giây):</label>
+                <input type="number" v-model.number="timeLimit" class="form-control" step="1">
+            </div>
             <div class="mb-3">
                 <label class="form-label">Giới hạn số hạng nhỏ nhất:</label>
-                <input type="number" v-model.number="minLimit" class="form-control">
+                <input type="number" v-model.number="minLimit" class="form-control" step="1">
             </div>
             <div class="mb-3">
                 <label class="form-label">Giới hạn số hạng lớn nhất:</label>
-                <input type="number" v-model.number="maxLimit" class="form-control">
+                <input type="number" v-model.number="maxLimit" class="form-control" step="1">
             </div>
             <div class="form-check form-switch form-switch-md mb-3">
                 <label class="form-check-label"> Cho phép kết quả âm</label>
@@ -172,11 +180,14 @@
             <button class="btn btn-secondary big-button" @click="startGame">Bắt đầu</button>
         </div>
 
-        <div v-else>
+        <div v-if="screenMode==1">
 
             <div v-if="!showResult">
-                <h4>Câu số {{ currentQuestion }} </h4>
+                <h4>Câu số {{ currentQuestion }}</h4>
                 <div class="question">{{ question }}</div>
+                <div class="mb-3">
+                    <span class="badge bg-primary">⏰: {{ remainingTime }} giây</span>
+                </div>
                 <input class="input-box form-control text-center mb-3 input-result" placeholder="Điền kết quả"
                     :value="userAnswer" readonly>
                 <div class="digit-container mb-3">
@@ -187,7 +198,7 @@
                     <button @click="appendDigit('.')">.</button>
                     <button class="big-text-button" @click="appendDigit('-')">-</button>
                     <button class="btn btn-danger double-collumn" @click="deleteLastDigit">Xóa</button>
-                    <button class="btn btn-success double-collumn" @click="checkAnswer">Kiểm tra</button>
+                    <button class="btn btn-success double-collumn" @click="checkAnswer(false)">Kiểm tra</button>
                 </div>
                 <div class="status-bar">
                     <p>Trả lời đúng: {{ correctCount }} ({{ accuracyPercentage }}%).</p>
@@ -197,8 +208,18 @@
             <div v-if="showResult" class="result">
                 <h2>{{ resultMessage }}</h2>
                 <p style="font-size: 100px;">{{ resultEmoji }}</p>
-                <button class="btn btn-secondary big-button" @click="resetGame">Làm lại</button>
+                <button class="btn btn-secondary big-button" @click="resetGame">Tiếp tục</button>
             </div>
+        </div>
+
+        <div v-if="screenMode==2" class="statistics">
+            <h2>Thống kê</h2>
+            <p>Câu hỏi: {{ correctCount }} / {{ totalQuestions }} ({{ finalAccuracyPercentage }}%)</p>
+            <p>Tổng thời gian: {{ totalTime }} giây</p>
+            <p>Nhanh nhất: {{ fastestTime }} / chậm nhất: {{ slowestTime }}</p>
+            <p>Đúng liên tiếp: {{ maxCorrectStreak }} / Sai liên tiếp: {{ maxIncorrectStreak }}</p>
+            <p><span style="font-size: 48px;">{{ resultEmoji }}</span></p>
+            <button @click="resetAll" class="btn btn-primary  big-button">Chơi lại</button>
         </div>
     </div>
 
@@ -208,10 +229,11 @@
         createApp({
             data() {
                 return {
+                    screenMode: 0,
                     minLimit: 1,
                     maxLimit: 100,
                     allowNegativeResults: false,
-                    operations: ['+', '-', '*', '/'],
+                    operations: ['+', '−', '×', '÷'],
                     selectedOperations: ['+'],
                     num1: 0,
                     num2: 0,
@@ -220,27 +242,64 @@
                     question: '',
                     showResult: false,
                     resultMessage: '',
-                    started: false,
+                    resultEmoji: '',
                     digits: Array.from({ length: 10 }, (_, i) => i),
+                    totalQuestions: 10, // Số lượng câu hỏi mặc định
                     currentQuestion: 0,
                     correctCount: 0,
+                    timeLimit: 30, // Thời gian giới hạn mặc định
+                    remainingTime: 0, // Thời gian còn lại cho câu hỏi hiện tại
+                    timer: null, // Bộ đếm thời gian
+                    totalTime: 0,
+                    fastestTime: null,
+                    slowestTime: null,
+                    currentStreak: 0,
+                    maxCorrectStreak: 0,
+                    maxIncorrectStreak: 0,
+                    incorrectStreak: 0,
                 };
             },
             computed: {
+                finalAccuracyPercentage() {
+                    return this.currentQuestion === 1 ? 0 : ((this.correctCount / (this.currentQuestion)) * 100).toFixed(0);
+                },
                 accuracyPercentage() {
-                    return this.currentQuestion === 1 ? 0 : ((this.correctCount / (this.currentQuestion - 1)) * 100).toFixed(2);
+                    return this.currentQuestion === 1 ? 0 : ((this.correctCount / (this.currentQuestion - 1)) * 100).toFixed(0);
+                },
+                getResponseTime() {
+                    return this.timeLimit - this.remainingTime + 1
                 },
             },
             methods: {
+                startTimer() {
+                    this.remainingTime = this.timeLimit;
+                    this.timer = setInterval(() => {
+                        this.remainingTime--;
+                        if (this.remainingTime <= 0) {
+                            clearInterval(this.timer);
+                            this.checkAnswer(true); // Tự động kiểm tra khi hết thời gian
+                        }
+                    }, 1000);
+                },
+                stopTimer() {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                },
                 generateQuestion() {
+                    if (this.currentQuestion >= this.totalQuestions) {
+                        this.showStatistics();
+                        return;
+                    }
+
                     this.currentQuestion++;
+                    this.stopTimer(); // Dừng bộ đếm thời gian của câu trước (nếu có)
                     do {
                         this.num1 = Math.floor(Math.random() * (this.maxLimit - this.minLimit + 1)) + this.minLimit;
                         this.num2 = Math.floor(Math.random() * (this.maxLimit - this.minLimit + 1)) + this.minLimit;
 
                         const operation = this.selectedOperations[Math.floor(Math.random() * this.selectedOperations.length)];
 
-                        if (operation === '/') {
+                        if (operation === '÷') {
                             this.num1 = this.num1 * this.num2;
                         }
 
@@ -248,19 +307,20 @@
                             case '+':
                                 this.correctAnswer = this.num1 + this.num2;
                                 break;
-                            case '-':
+                            case '−':
                                 this.correctAnswer = this.num1 - this.num2;
                                 break;
-                            case '*':
+                            case '×':
                                 this.correctAnswer = this.num1 * this.num2;
                                 break;
-                            case '/':
+                            case '÷':
                                 this.correctAnswer = this.num1 / this.num2;
                                 break;
                         }
 
                         this.question = `${this.num1} ${operation} ${this.num2} = ?`;
                     } while (!this.allowNegativeResults && this.correctAnswer < 0);
+                    this.startTimer(); // Bắt đầu đếm ngược cho câu hỏi mới
                 },
                 appendDigit(digit) {
                     this.userAnswer += digit;
@@ -268,16 +328,34 @@
                 deleteLastDigit() {
                     this.userAnswer = this.userAnswer.slice(0, -1);
                 },
-                checkAnswer() {
-                    if (parseFloat(this.userAnswer) === this.correctAnswer) {
+                checkAnswer(timeout = false) {
+                    const responseTime = this.getResponseTime()
+                    this.totalTime += responseTime
+                    this.stopTimer();
+                    if (!timeout && parseFloat(this.userAnswer) === this.correctAnswer) {
                         document.getElementById("correct").play();
                         this.correctCount++;
+                        this.currentStreak++;
+                        this.maxCorrectStreak = Math.max(this.maxCorrectStreak, this.currentStreak);
+                        this.incorrectStreak = 0;
+                        if (this.fastestTime === null || responseTime < this.fastestTime) {
+                            this.fastestTime = responseTime;
+                        }
+                        if (this.slowestTime === null || responseTime > this.slowestTime) {
+                            this.slowestTime = responseTime;
+                        }
+
                         this.resultMessage = 'Chính xác!';
                         document.body.style.backgroundColor = '#c8f7c5';
                         this.resultEmoji = this.getSuccessEmoji();
                     } else {
+
+                        this.currentStreak = 0;
+                        this.incorrectStreak++;
+                        this.maxIncorrectStreak = Math.max(this.maxIncorrectStreak, this.incorrectStreak);
+
                         document.getElementById("incorrect").play();
-                        this.resultMessage = `Sai! Đáp án đúng là: ${this.correctAnswer}.`;
+                        this.resultMessage = timeout ? `Hết giờ! Đáp án đúng là: ${this.correctAnswer}.` : `Sai! Đáp án đúng là: ${this.correctAnswer}.`;
                         document.body.style.backgroundColor = '#f7c5c5';
                         this.resultEmoji = this.getSuccessEmoji();
                     }
@@ -420,21 +498,52 @@
                         return '😟';
                     }
                 },
+                showStatistics() {
+                    this.screenMode = 2;
+                },
                 resetGame() {
+                    this.stopTimer();
                     this.showResult = false;
+                    this.screenMode = 1;
                     this.resultMessage = '';
                     this.userAnswer = '';
                     document.body.style.backgroundColor = '#f9f9f9';
                     this.generateQuestion();
+                },
+                resetAll() {
+                    this.screenMode = 0;
                 },
                 startGame() {
                     if (this.selectedOperations.length === 0) {
                         alert('Vui lòng chọn ít nhất một phép tính.');
                         return;
                     }
-                    this.started = true;
+
+                    if (!Number.isInteger(this.minLimit) || !Number.isInteger(this.maxLimit)) {
+                        alert('Giới hạn số hạng phải là số nguyên (Không có dấu chấm/phẩy).');
+                        return;
+                    }
+
+                    if (this.minLimit < -10000 || this.maxLimit > 10000) {
+                        alert('Giới hạn số hạng phải nằm trong khoảng từ -10000 đến 10000.');
+                        return;
+                    }
+
+                    if (this.minLimit >= this.maxLimit) {
+                        alert('Giới hạn nhỏ nhất phải nhỏ hơn giới hạn lớn nhất.');
+                        return;
+                    }
+
+
+                    this.screenMode = 1;
                     this.currentQuestion = 0;
                     this.correctCount = 0;
+                    this.totalTime = 0;
+                    this.fastestTime = 0;
+                    this.slowestTime = 0;
+                    this.currentStreak = 0;
+                    this.maxCorrectStreak = 0;
+                    this.maxIncorrectStreak = 0;
                     this.generateQuestion();
                 },
             },
