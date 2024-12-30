@@ -121,10 +121,13 @@
             color: rgb(9, 116, 255);
             /* background-color: #f0f0f0; */
         }
-        .form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+
+        .form-control::placeholder {
+            /* Chrome, Firefox, Opera, Safari 10.1+ */
             color: rgb(9, 116, 255);
-            opacity: 0.1; /* Firefox */
-}
+            opacity: 0.1;
+            /* Firefox */
+        }
 
 
         .form-switch.form-switch-md .form-check-input {
@@ -174,8 +177,8 @@
             <div v-if="!showResult">
                 <h4>Câu số {{ currentQuestion }} </h4>
                 <div class="question">{{ question }}</div>
-                <input class="input-box form-control text-center mb-3 input-result" placeholder="Điền kết quả" :value="userAnswer"
-                    readonly>
+                <input class="input-box form-control text-center mb-3 input-result" placeholder="Điền kết quả"
+                    :value="userAnswer" readonly>
                 <div class="digit-container mb-3">
                     <button class="btn btn-warning big-text-button " v-for="digit in digits" :key="digit"
                         @click="appendDigit(digit)">
@@ -283,129 +286,138 @@
                 getSuccessEmoji() {
                     const accuracy = (this.correctCount / this.currentQuestion) * 100;
                     if (accuracy >= 95) {
-                        if (this.currentQuestion > 10){
-                            return '🏅'
+                        if (this.currentQuestion < 10) {
+                            return '💯'
                         }
-                        if (this.currentQuestion > 20){
+                        if (this.currentQuestion < 20) {
+                            return '💖'
+                        }
+                        if (this.currentQuestion < 30) {
                             return '🥉'
                         }
-                        if (this.currentQuestion > 30){
+                        if (this.currentQuestion < 40) {
                             return '🥈'
                         }
-                        if (this.currentQuestion > 40){
+                        if (this.currentQuestion < 50) {
                             return '🥇'
                         }
-                        if (this.currentQuestion > 50){
+                        if (this.currentQuestion < 60) {
+                            return '🏅'
+                        }
+                        if (this.currentQuestion < 70) {
                             return '🏆'
                         }
-                        if (this.currentQuestion > 60){
-                            return '🚀'
-                        }
-                        if (this.currentQuestion > 70){
-                            return '👑'
-                        }
-                        if (this.currentQuestion > 80){
-                            return '💎'
-                        }
-                        if (this.currentQuestion > 90){
+                        if (this.currentQuestion < 80) {
                             return '⭐'
                         }
-                        if (this.currentQuestion > 100){
+                        if (this.currentQuestion < 90) {
                             return '⭐⭐'
                         }
-                        if (this.currentQuestion > 110){
+                        if (this.currentQuestion < 100) {
                             return '⭐🌟⭐'
                         }
-                        if (this.currentQuestion > 120){
-                            return '⭐⭐⭐⭐'
+                        if (this.currentQuestion < 110) {
+                            return '✨'
                         }
-                        if (this.currentQuestion > 130){
-                            return '⭐⭐🌟⭐⭐'
+                        if (this.currentQuestion < 120) {
+                            return '💎'
                         }
-                        return '🥳'
+                        if (this.currentQuestion < 130) {
+                            return '👑'
+                        }
+                        if (this.currentQuestion < 140) {
+                            return '🚀'
+                        }
+                        return '💯'
                     } else if (accuracy >= 80) {
-                        if (this.currentQuestion > 10){
-                            return '🥸'
+                        if (this.currentQuestion < 10) {
+                            return '😊'
                         }
-                        if (this.currentQuestion > 20){
+                        if (this.currentQuestion < 20) {
                             return '😄'
                         }
-                        if (this.currentQuestion > 30){
+                        if (this.currentQuestion < 30) {
                             return '😁'
                         }
-                        if (this.currentQuestion > 40){
+                        if (this.currentQuestion < 40) {
                             return '😆'
                         }
-                        if (this.currentQuestion > 50){
+                        if (this.currentQuestion < 50) {
                             return '🤗'
                         }
-                        if (this.currentQuestion > 60){
+                        if (this.currentQuestion < 60) {
                             return '😘'
                         }
-                        if (this.currentQuestion > 70){
+                        if (this.currentQuestion < 70) {
                             return '😘'
                         }
-                        if (this.currentQuestion > 80){
+                        if (this.currentQuestion < 80) {
                             return '💡'
                         }
-                        if (this.currentQuestion > 90){
+                        if (this.currentQuestion < 90) {
                             return '🎁'
                         }
-                        if (this.currentQuestion > 100){
+                        if (this.currentQuestion < 100) {
                             return '🥰'
                         }
-                        if (this.currentQuestion > 110){
+                        if (this.currentQuestion < 110) {
                             return '🎉'
                         }
-                        if (this.currentQuestion > 120){
+                        if (this.currentQuestion < 120) {
                             return '🎊'
                         }
-                        if (this.currentQuestion > 130){
+                        if (this.currentQuestion < 130) {
                             return '🤩'
                         }
-                        return '😄';
+                        if (this.currentQuestion < 140) {
+                            return '⭐'
+                        }
+                        return '😊';
                     } else {
-                        if (this.currentQuestion > 10){
+                        if (this.currentQuestion < 10) {
                             return '😟'
                         }
-                        if (this.currentQuestion > 20){
-                            return '🫨'
-                        }
-                        if (this.currentQuestion > 30){
+                        if (this.currentQuestion < 20) {
                             return '🐣'
                         }
-                        if (this.currentQuestion > 40){
+                        if (this.currentQuestion < 30) {
+                            return '👶'
+                        }
+                        if (this.currentQuestion < 40) {
                             return '😖'
                         }
-                        if (this.currentQuestion > 50){
+                        if (this.currentQuestion < 50) {
                             return '🤡'
                         }
-                        if (this.currentQuestion > 60){
-                            return '😮‍💨'
-                        }
-                        if (this.currentQuestion > 70){
+                        if (this.currentQuestion < 60) {
                             return '😵'
                         }
-                        if (this.currentQuestion > 80){
+                        if (this.currentQuestion < 70) {
+                            return '🤯'
+                        }
+                        if (this.currentQuestion < 80) {
                             return '🐧'
                         }
-                        if (this.currentQuestion > 90){
+                        if (this.currentQuestion < 90) {
                             return '🥺'
                         }
-                        if (this.currentQuestion > 100){
+                        if (this.currentQuestion < 100) {
                             return '🙈'
                         }
-                        if (this.currentQuestion > 110){
-                            return '🫣'
+                        if (this.currentQuestion < 110) {
+                            return '🤕'
                         }
-                        if (this.currentQuestion > 120){
-                            return '😭' 
+                        if (this.currentQuestion < 120) {
+                            return '😭'
                         }
-                        if (this.currentQuestion > 130){
+                        if (this.currentQuestion < 130) {
                             return '😱'
                         }
+                        if (this.currentQuestion < 140) {
+                            return '💩'
+                        }
 
-                        return '🤔';
+                        return '😟';
                     }
                 },
                 resetGame() {
