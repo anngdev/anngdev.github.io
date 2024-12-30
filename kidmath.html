@@ -216,7 +216,7 @@
             <h2>Thống kê</h2>
             <p>Câu hỏi: {{ correctCount }} / {{ totalQuestions }} ({{ finalAccuracyPercentage }}%)</p>
             <p>Tổng thời gian: {{ totalTime }} giây</p>
-            <p>Nhanh nhất: {{ fastestTime }} / chậm nhất: {{ slowestTime }}</p>
+            <p>Nhanh nhất: {{ fastestTime }} / Chậm nhất: {{ slowestTime }}</p>
             <p>Đúng liên tiếp: {{ maxCorrectStreak }} / Sai liên tiếp: {{ maxIncorrectStreak }}</p>
             <p><span style="font-size: 48px;">{{ resultEmoji }}</span></p>
             <button @click="resetAll" class="btn btn-primary  big-button">Chơi lại</button>
@@ -260,17 +260,17 @@
                 };
             },
             computed: {
-                finalAccuracyPercentage() {
-                    return this.currentQuestion === 1 ? 0 : ((this.correctCount / (this.currentQuestion)) * 100).toFixed(0);
-                },
                 accuracyPercentage() {
                     return this.currentQuestion === 1 ? 0 : ((this.correctCount / (this.currentQuestion - 1)) * 100).toFixed(0);
                 },
-                getResponseTime() {
-                    return this.timeLimit - this.remainingTime + 1
+                finalAccuracyPercentage() {
+                    return this.currentQuestion === 1 ? 0 : ((this.correctCount / (this.currentQuestion)) * 100).toFixed(0);
                 },
             },
             methods: {
+                getResponseTime() {
+                    return this.timeLimit - this.remainingTime + 1
+                },
                 startTimer() {
                     this.remainingTime = this.timeLimit;
                     this.timer = setInterval(() => {
@@ -338,6 +338,8 @@
                         this.currentStreak++;
                         this.maxCorrectStreak = Math.max(this.maxCorrectStreak, this.currentStreak);
                         this.incorrectStreak = 0;
+                        console.log("responseTime", responseTime)
+                        console.log("responseTime", this.fastestTime)
                         if (this.fastestTime === null || responseTime < this.fastestTime) {
                             this.fastestTime = responseTime;
                         }
@@ -539,8 +541,8 @@
                     this.currentQuestion = 0;
                     this.correctCount = 0;
                     this.totalTime = 0;
-                    this.fastestTime = 0;
-                    this.slowestTime = 0;
+                    this.fastestTime = null;
+                    this.slowestTime = null;
                     this.currentStreak = 0;
                     this.maxCorrectStreak = 0;
                     this.maxIncorrectStreak = 0;
