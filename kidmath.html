@@ -34,8 +34,14 @@
             gap: 10px;
         }
 
+        .operator-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
         h2 {
-            font-size: 20px;
+            font-size: 26px;
             font-weight: bold;
         }
 
@@ -138,7 +144,7 @@
                 <input class="form-check-input" type="checkbox" v-model="allowNegativeResults">
             </div>
             <h3 class="mb-2">Chọn phép tính:</h3>
-            <div class="mb-3">
+            <div class="operator-container mb-3">
                 <label v-for="operation in operations" :key="operation" class="form-check">
                     <input type="checkbox" :value="operation" v-model="selectedOperations" class="form-check-input"> {{
                     operation }}
@@ -155,7 +161,8 @@
                 <input class="input-box form-control text-center mb-3" placeholder="Điền kết quả" :value="userAnswer"
                     readonly>
                 <div class="digit-container mb-3">
-                    <button class="btn btn-warning big-text-button " v-for="digit in digits" :key="digit" @click="appendDigit(digit)">
+                    <button class="btn btn-warning big-text-button " v-for="digit in digits" :key="digit"
+                        @click="appendDigit(digit)">
                         {{ digit }}
                     </button>
                     <button @click="appendDigit('.')">.</button>
@@ -201,7 +208,7 @@
             },
             computed: {
                 accuracyPercentage() {
-                    return this.currentQuestion === 1 ? 0 : ((this.correctCount / (this.currentQuestion-1)) * 100).toFixed(2);
+                    return this.currentQuestion === 1 ? 0 : ((this.correctCount / (this.currentQuestion - 1)) * 100).toFixed(2);
                 },
             },
             methods: {
