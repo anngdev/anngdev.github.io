@@ -134,6 +134,14 @@
 </head>
 
 <body>
+    <audio id="correct">
+        <source src="ting.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="incorrect">
+        <source src="error.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
     <div id="app" class="container">
         <!-- <h2 class="mb-4">Math Quiz</h1> -->
 
@@ -259,11 +267,13 @@
                 },
                 checkAnswer() {
                     if (parseFloat(this.userAnswer) === this.correctAnswer) {
+                        document.getElementById("correct").play();
                         this.correctCount++;
                         this.resultMessage = 'Chính xác!';
                         document.body.style.backgroundColor = '#c8f7c5';
                         this.resultEmoji = this.getSuccessEmoji();
                     } else {
+                        document.getElementById("incorrect").play();
                         this.resultMessage = `Sai! Đáp án đúng là: ${this.correctAnswer}.`;
                         document.body.style.backgroundColor = '#f7c5c5';
                         this.resultEmoji = this.getSuccessEmoji();
