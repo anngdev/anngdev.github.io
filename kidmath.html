@@ -385,7 +385,7 @@
                         }
 
                         this.resultMessage = 'Chính xác!';
-                        document.body.style.backgroundColor = '#c8f7c5';
+                        document.body.style.backgroundColor = '#eeffed';
                         this.resultEmoji = this.getSuccessEmoji(true);
                     } else {
 
@@ -395,24 +395,24 @@
 
                         document.getElementById("incorrect").play();
                         this.resultMessage = timeout ? `Hết giờ! Đáp án đúng là: ${this.correctAnswer}.` : `Sai! Đáp án đúng là: ${this.correctAnswer}.`;
-                        document.body.style.backgroundColor = '#f7c5c5';
+                        document.body.style.backgroundColor = '#faf3de';
                         this.resultEmoji = this.getSuccessEmoji(false);
                     }
                     this.showResult = true;
                 },
                 getSuccessEmoji(isCorrect = false) {
                     const accuracy = (this.correctCount / this.currentQuestion) * 100;
-                    const qIndexNormalize =  Math.floor(this.currentQuestion/2)
+                    const qIndexNormalize =  Math.floor(this.currentQuestion/3)
                     if (accuracy >= 95) {
-                        const emoji = ['💯', '💖', '🥉', '🥈', '🥇', '🏅', '🏆', '⭐', '⭐⭐', '⭐🌟⭐', '✨', '💎', '👑', '🚀']
+                        const emoji = ['💯', '♥️',  '💖', '💞', '💡', '🎁', '🎉', '🎊', '🥉', '🥈', '🥇', '🏅', '🏆', '⭐', '⭐⭐', '⭐🌟⭐', '✨','💫', '🌠', '☀️', '💎', '👑', '🚀']
                         const rindex = Math.min(qIndexNormalize, emoji.length)
                         return emoji[rindex]
                     } else if (accuracy >= 80 || isCorrect) {
-                        const emoji = ['😊', '😄', '😁', '😆', '🤗', '😘', '💡', '🎁', '🥰', '🎉', '🎊', '🤩', '⭐']
+                        const emoji = ['😊', '😄', '🤭', '🤓', '😁', '👍', '😆', '😎', '😤', '✌️', '🤗', '😘', '🥰', '😍', '👏', '😸', '😻', '🤩', '⭐']
                         const rindex = Math.min(qIndexNormalize, emoji.length)
                         return emoji[rindex]
                     } else {
-                        const emoji = ['😟', '🐣', '👶', '😖', '🤡', '😵', '🤯', '🐧', '🥺', '🙈', '🤕', '😭', '😱', '💩']
+                        const emoji = ['😟', '😞', '😕', '🙁', '😣', '😦', '😒', '🙄', '😠', '😫', '😩', '😧', '😖', '😢', '😥', '😪', '🫤', '😵', '🥺', '🤕', '😭', '😨', '😰', '😱', '🫨', '😵‍💫', '🤯', '🐣', '👶', '🙈', '🐧', '🫥', '🤡', '😮‍💨', '😶‍🌫️', '💔', '💩']
                         const rindex = Math.min(qIndexNormalize, emoji.length)
                         return emoji[rindex]
                     }
