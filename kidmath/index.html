@@ -393,21 +393,25 @@
                     this.showResult = true;
                 },
                 getSuccessEmoji(isCorrect = false) {
+                    const w_emoji = ['💯', '♥️',  '💖', '💞', '💡', '🎁', '🎉', '🎊', '🥉', '🥈', '🥇', '🏅', '🏆', '⭐', '⭐⭐', '⭐🌟⭐', '✨','💫', '🌠', '☀️', '💎', '👑', '🚀']
+                    const r_emoji = ['😊', '😄', '🤭', '🤓', '😁', '👍', '😆', '😎', '😤', '✌️', '🤗', '😘', '🥰', '😍', '👏', '😸', '😻', '🤩', '⭐']
+                    const l_emoji = ['😟', '😞', '😕', '🙁', '😣', '😦', '😒', '🙄', '😠', '😫', '😩', '😧', '😖', '😢', '😥', '😪', '😵', '🥺', '🤕', '😭', '😨', '😰', '😱', '🤯', '🐣', '👶', '🙈', '🐧', '🤡', '💔', '💩']
                     const accuracy = (this.correctCount / this.currentQuestion) * 100;
-                    const qIndexNormalize =  Math.floor(this.currentQuestion/3)
-                    if (accuracy >= 95) {
-                        const emoji = ['💯', '♥️',  '💖', '💞', '💡', '🎁', '🎉', '🎊', '🥉', '🥈', '🥇', '🏅', '🏆', '⭐', '⭐⭐', '⭐🌟⭐', '✨','💫', '🌠', '☀️', '💎', '👑', '🚀']
-                        const rindex = Math.min(qIndexNormalize, emoji.length)
-                        return emoji[rindex]
-                    } else if (accuracy >= 80 || isCorrect) {
-                        const emoji = ['😊', '😄', '🤭', '🤓', '😁', '👍', '😆', '😎', '😤', '✌️', '🤗', '😘', '🥰', '😍', '👏', '😸', '😻', '🤩', '⭐']
-                        const rindex = Math.min(qIndexNormalize, emoji.length)
-                        return emoji[rindex]
-                    } else {
-                        const emoji = ['😟', '😞', '😕', '🙁', '😣', '😦', '😒', '🙄', '😠', '😫', '😩', '😧', '😖', '😢', '😥', '😪', '🫤', '😵', '🥺', '🤕', '😭', '😨', '😰', '😱', '🫨', '😵‍💫', '🤯', '🐣', '👶', '🙈', '🐧', '🫥', '🤡', '😮‍💨', '😶‍🌫️', '💔', '💩']
-                        const rindex = Math.min(qIndexNormalize, emoji.length)
-                        return emoji[rindex]
+                    const minModl = 3
+                    let modl = 3
+                    if (this.totalQuestions > (w_emoji.length*modl)){
+                        modl = Math.floor(this.totalQuestions/w_emoji.length)
                     }
+                    const qIndexNormalize =  Math.floor(this.currentQuestion/modl)
+                    let emoji = l_emoji
+                    if (accuracy >= 95) {
+                        emoji = w_emoji
+                    } else if (accuracy >= 80 || isCorrect) {
+                        emoji = r_emoji
+                    }
+                    
+                    const rindex = Math.min(qIndexNormalize, emoji.length - 1)
+                    return emoji[rindex]
                 },
                 showStatistics() {
                     this.screenMode = 2;
