@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <!-- <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Math Quiz</title>
     <script src="vue.global.js"></script>
@@ -17,23 +17,26 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            /* background-color: #f9f9f9; */
             background-image: url('doodle_background.jpg');
+            background-size: cover;
+            background-position: center;
             color: #333;
         }
 
         .container {
-            /* width: 80%; */
-            max-width: 80%;
+            width: 90%;
+            max-width: 95%;
+            max-height: 95%;
             padding: 20px;
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* overflow: hidden; */
         }
 
         .digit-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 10px;
         }
 
@@ -52,14 +55,10 @@
             font-size: 20px;
         }
 
-        label {
-            font-size: 20px;
-        }
-
         .big-button {
-            height: 60px;
+            height: 42px;
             width: 100%;
-            font-size: 26px;
+            font-size: 20px;
             touch-action: manipulation;
 
         }
@@ -71,9 +70,6 @@
             font-weight: bolder;
             border-radius: 10px;
             border: none;
-            /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
-            /* background-color: #f0f0f0; */
-            /* color: #333; */
             transition: background-color 0.2s;
             touch-action: manipulation;
         }
@@ -82,56 +78,51 @@
             grid-column: span 2;
         }
 
-        /* .digit-container button:hover {
-            background-color: #d6d6d6;
-        } */
-        .status-bar {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-
-        .question {
-            font-size: 48px;
-            font-weight: bold;
-        }
-
         .result {
             font-size: 24px;
             margin: 20px 0;
         }
 
-        @media (max-width: 768px) {
-            .question {
-                font-size: 28px;
-            }
+        .setup-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
         }
 
-        .setup-container {
-            display: flex;
-            flex-direction: column;
+        .al-center {
             align-items: center;
         }
 
-        .input-box {
-            height: 100px;
+
+        .question {
+            height: 60px;
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .input-answer-box {
+            height: 70px;
             line-height: 60px;
-            font-size: 50px;
+            font-size: 48px;
             border-radius: 8px;
             font-weight: bolder;
-            color: rgb(9, 116, 255);
-            /* background-color: #f0f0f0; */
         }
 
         .form-control::placeholder {
             /* Chrome, Firefox, Opera, Safari 10.1+ */
-            color: rgb(9, 116, 255);
+            color: rgb(0, 0, 0);
             opacity: 0.1;
             /* Firefox */
         }
 
-
         .form-switch.form-switch-md .form-check-input {
             height: 1.5rem;
+        }
+
+        .form-check-input {
+            margin-top: -1px;
+            height: 24px;
+            width: 24px;
         }
     </style>
 </head>
@@ -146,62 +137,109 @@
         Your browser does not support the audio element.
     </audio>
     <div id="app" class="container">
-        <!-- <h2 class="mb-4">Math Quiz</h1> -->
-
-        <div v-if="screenMode==0" class="setup-container">
-            <h2 class="mb-3">Thiết lập trò chơi</h2>
+        <div v-if="screenMode==0">
+            <h2 class="mb-3">Thiết lập</h2>
             <div>
-                <label>Số lượng câu hỏi:</label>
-                <input type="number" v-model.number="totalQuestions" class="form-control" step="1" min="1">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Thời gian trả lời mỗi câu (giây):</label>
-                <input type="number" v-model.number="timeLimit" class="form-control" step="1">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Giới hạn số hạng nhỏ nhất:</label>
-                <input type="number" v-model.number="minLimit" class="form-control" step="1">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Giới hạn số hạng lớn nhất:</label>
-                <input type="number" v-model.number="maxLimit" class="form-control" step="1">
-            </div>
-            <div class="form-check form-switch form-switch-md mb-3">
-                <label class="form-check-label"> Cho phép kết quả âm</label>
-                <input class="form-check-input" type="checkbox" v-model="allowNegativeResults">
-            </div>
-            <h3 class="mb-2">Chọn phép tính:</h3>
-            <div class="operator-container mb-3">
-                <label v-for="operation in operations" :key="operation" class="form-check">
-                    <input type="checkbox" :value="operation" v-model="selectedOperations" class="form-check-input"> {{
-                    operation }}
-                </label>
+                <div class="row">
+                    <div class="col">
+                        <label>Số câu:</label>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Thời gian mỗi câu:</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <input type="number" v-model.number="totalQuestions" class="form-control" step="1" min="1">
+                    </div>
+                    <div class="col">
+                        <input type="number" v-model.number="timeLimit" class="form-control" step="1">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label">Số hạng nhỏ nhất:</label>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Số hạng lớn nhất:</label>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col">
+                        <input type="number" v-model.number="minLimit" class="form-control" step="1">
+                    </div>
+                    <div class="col">
+                        <input type="number" v-model.number="maxLimit" class="form-control" step="1">
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label">Có kết quả âm:</label>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Phép tính:</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <input class="form-check-input" type="checkbox" v-model="allowNegativeResults">
+                    </div>
+
+                    <div class="col">
+                        <div class="operator-container mb-3">
+                            <label v-for="operation in operations" :key="operation" class="form-check">
+                                <input type="checkbox" :value="operation" v-model="selectedOperations"
+                                    class="form-check-input">
+                                {{
+                                operation }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <button class="btn btn-secondary big-button" @click="startGame">Bắt đầu</button>
         </div>
 
         <div v-if="screenMode==1">
-
             <div v-if="!showResult">
-                <h4>Câu số {{ currentQuestion }}</h4>
-                <div class="question">{{ question }}</div>
-                <div class="mb-3">
-                    <span class="badge bg-primary">⏰: {{ remainingTime }} giây</span>
+                <div class="row">
+                    <div class="col text-start">
+                        Trả lời đúng: {{ correctCount }} ({{ accuracyPercentage }}%)
+                    </div>
+                    <div class="col">
+                        Câu số: {{ currentQuestion }}.
+                    </div>
+                    <div class="col text-end">
+                        <span class="badge bg-primary">⏰: {{ remainingTime }} giây</span>
+                    </div>
                 </div>
-                <input class="input-box form-control text-center mb-3 input-result" placeholder="Điền kết quả"
-                    :value="userAnswer" readonly>
-                <div class="digit-container mb-3">
+
+                <div class="row">
+                    <div class="col-auto p-3">
+                        <div class="question d-flex">{{ question }}</div>
+                    </div>
+                    <div class="col p-3">
+                        <input class="input-answer-box form-control text-center input-result"
+                            placeholder="? ? ?" :value="userAnswer" readonly>
+                    </div>
+                </div>
+
+                <div class="digit-container">
                     <button class="btn btn-warning big-text-button " v-for="digit in digits" :key="digit"
                         @click="appendDigit(digit)">
                         {{ digit }}
                     </button>
                     <button @click="appendDigit('.')">.</button>
                     <button class="big-text-button" @click="appendDigit('-')">-</button>
-                    <button class="btn btn-danger double-collumn" @click="deleteLastDigit">Xóa</button>
+                    <button class="btn btn-danger" @click="deleteLastDigit">Xóa</button>
                     <button class="btn btn-success double-collumn" @click="checkAnswer(false)">Kiểm tra</button>
-                </div>
-                <div class="status-bar">
-                    <p>Trả lời đúng: {{ correctCount }} ({{ accuracyPercentage }}%).</p>
                 </div>
             </div>
 
@@ -318,7 +356,7 @@
                                 break;
                         }
 
-                        this.question = `${this.num1} ${operation} ${this.num2} = ?`;
+                        this.question = `${this.num1} ${operation} ${this.num2} =`;
                     } while (!this.allowNegativeResults && this.correctAnswer < 0);
                     this.startTimer(); // Bắt đầu đếm ngược cho câu hỏi mới
                 },
