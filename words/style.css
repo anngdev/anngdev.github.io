@@ -67,8 +67,10 @@ button {
 
 .result-area {
   display: flex;
+  flex-wrap: wrap; /* Tự động xuống hàng nếu không đủ không gian */
   justify-content: center;
   margin-bottom: 20px;
+  max-width: 90%; /* Giới hạn chiều rộng để tránh tràn màn hình */
 }
 
 .result-box {
@@ -82,11 +84,6 @@ button {
   font-size: 20px;
   background-color: #f8f9fa;
   cursor: pointer;
-}
-
-.shuffled-area {
-  display: flex;
-  justify-content: center;
 }
 
 .result-box {
@@ -107,6 +104,13 @@ button {
   background-color: #e9f7e9;
 }
 
+.shuffled-area {
+  display: flex;
+  flex-wrap: wrap; /* Tự động xuống hàng nếu không đủ không gian */
+  justify-content: center;
+  max-width: 90%; /* Giới hạn chiều rộng */
+}
+
 .shuffled-box {
   width: 40px;
   height: 40px;
@@ -122,4 +126,13 @@ button {
 
 .shuffled-box:hover, .result-box:hover {
   background-color: #e9ecef;
+}
+
+@media screen and (max-width: 600px) {
+  .result-box,
+  .shuffled-box {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
 }
