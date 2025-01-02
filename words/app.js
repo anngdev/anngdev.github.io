@@ -1,15 +1,17 @@
 const app = Vue.createApp({
   data() {
     return {
-      screen: 'settings', // Possible values: 'settings', 'quiz', 'result'
+      screen: 'settings',
       vocabularyInput: '',
       vocabulary: [],
       currentWord: null,
-      shuffledWord: [],
+      resultArray: [], // Phần A: kết quả
+      shuffledWord: [], // Phần B: ký tự chưa chọn
       currentIndex: 0,
       countdownTime: 30,
       timeLeft: 0,
       timer: null,
+      selectedResultIndex: null, // Vị trí được chọn trong Phần A
       isAnswerCorrect: false,
       correctAnswers: 0,
       totalQuestions: 0,
@@ -40,7 +42,9 @@ const app = Vue.createApp({
     },
     loadWord() {
       this.currentWord = this.vocabulary[this.currentIndex];
+      this.resultArray = Array(this.currentWord.length).fill(''); // Tạo ô trống
       this.shuffledWord = this.shuffle(this.currentWord.split(''));
+      this.selectedResultIndex = 0; // Mặc định chọn ô đầu tiên
       this.timeLeft = this.countdownTime;
       this.startTimer();
     },
@@ -57,17 +61,34 @@ const app = Vue.createApp({
         }
       }, 1000);
     },
-    onDragStart(index) {
-      this.draggedIndex = index;
+    selectFromShuffled(index) {
+      const selectedChar = this.shuffledWord[index];
+      if (this.selectedResultIndex !== null) {
+        // Điền ký tự vào ô được chọn trong Phần A
+        this.resultArray[this.selectedResultIndex] = selectedChar;
+        this.shuffledWord.splice(index, 1); // Xóa ký tự khỏi Phần B
+
+        // Tìm ô trống tiếp theo
+        this.findNextEmptyResult();
+      }
     },
-    onDrop(index) {
-      const temp = this.shuffledWord[index];
-      this.shuffledWord[index] = this.shuffledWord[this.draggedIndex];
-      this.shuffledWord[this.draggedIndex] = temp;
+    selectFromResult(index) {
+      if (this.resultArray[index]) {
+        // Chuyển ký tự từ Phần A về Phần B
+        const charToReturn = this.resultArray[index];
+        this.resultArray[index] = '';
+        this.shuffledWord.push(charToReturn);
+      }
+      // Chọn ô hiện tại
+      this.selectedResultIndex = index;
+    },
+    findNextEmptyResult() {
+      const nextEmptyIndex = this.resultArray.indexOf('');
+      this.selectedResultIndex = nextEmptyIndex !== -1 ? nextEmptyIndex : null;
     },
     checkAnswer() {
       clearInterval(this.timer);
-      this.isAnswerCorrect = this.shuffledWord.join('') === this.currentWord;
+      this.isAnswerCorrect = this.resultArray.join('') === this.currentWord;
       if (this.isAnswerCorrect) this.correctAnswers += 1;
       this.totalQuestions += 1;
       this.screen = 'result';
