@@ -11,22 +11,37 @@
 
 <body>
   <div id="app" class="container">
-    <h1>Learn English Vocabulary</h1>
+    <!-- <h1>Learn English Vocabulary</h1> -->
 
     <!-- Screen: Settings -->
-    <div v-if="screen === 'settings'" class="settings-screen">
+    <div v-if="screenMode == 0" class="settings-screen">
       <h1 class="mb-4">Thiết lập trò chơi</h1>
-
       <div class="mb-3">
         <label for="vocabularyInput" class="form-label">Danh sách từ vựng:</label>
-        <textarea id="vocabularyInput" class="form-control" v-model="vocabularyInput" rows="4" placeholder="Nhập từ vựng, cách nhau bằng dấu phẩy"></textarea>
+        <textarea id="vocabularyInput" class="form-control" v-model="vocabularyInput" rows="4"
+          placeholder="Nhập từ vựng, cách nhau bằng dấu phẩy"></textarea>
       </div>
 
-      <div class="mb-3">
-        <label for="countdownTime" class="form-label">Thời gian cho mỗi câu (giây):</label>
-        <input id="countdownTime" type="number" class="form-control" v-model="countdownTime" min="5" />
-      </div>
+      <div>
+        <div class="row">
+          <div class="col">
+            <label>Số câu:</label>
+          </div>
+          <div class="col">
+            <label class="form-label">Thời gian mỗi câu:</label>
+          </div>
+        </div>
 
+        <div class="row">
+          <div class="col">
+            <input type="number" v-model.number="totalQuestions" class="form-control" step="1" min="1">
+          </div>
+          <div class="col">
+            <input type="number" v-model.number="timeLimit" class="form-control" step="1">
+          </div>
+        </div>
+      </div>
+      
       <div class="mb-3">
         <label for="predefinedVocabularies" class="form-label">Chọn bộ từ vựng có sẵn:</label>
         <select id="predefinedVocabularies" class="form-select" v-model="selectedVocabulary">
@@ -59,8 +74,20 @@
     </div>
 
     <!-- Screen: Quiz -->
-    <div v-if="screen === 'quiz'" class="quiz-screen">
-      <div class="timer">Time left: {{ timeLeft }} seconds</div>
+    <div v-if="screenMode == 1" class="quiz-screen">
+
+      <div class="row">
+        <div class="col text-start">
+          Trả lời đúng: {{ correctCount }} ({{ accuracyPercentage }}%)
+        </div>
+        <div class="col">
+          <b>Câu số: {{ currentQuestion }}/{{ totalQuestions }}.</b>
+
+        </div>
+        <div class="col text-end">
+          <span class="badge bg-primary">⏰: {{ timeLeft }} giây</span>
+        </div>
+      </div>
 
       <!-- Phần A: Kết quả -->
       <div class="result-area">
@@ -83,11 +110,9 @@
 
 
     <!-- Screen: Result -->
-    <div v-if="screen === 'result'">
-      <h2>Result</h2>
-      <p v-if="isAnswerCorrect">✅ Correct!</p>
-      <p v-else>❌ Incorrect!</p>
-      <p>Score: {{ correctAnswers }} / {{ totalQuestions }} ({{ percentage }}%)</p>
+    <div v-if="screenMode === 2">
+      <h2>{{ resultMessage }}</h2>
+      <p style="font-size: 100px;">{{ resultEmoji }}</p>
       <button v-if="currentIndex < vocabulary.length - 1" @click="nextWord">Next Word</button>
       <button v-else @click="resetQuiz">Finish Quiz</button>
     </div>

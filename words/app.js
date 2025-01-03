@@ -15,18 +15,19 @@ function loadFromCookie(key) {
 const app = Vue.createApp({
   data() {
     return {
-      screen: 'settings',
+      screenMode: 0,
       vocabularyInput: '',
       vocabulary: [],
       currentWord: null,
       resultArray: [], // Phần A: kết quả
       shuffledWord: [], // Phần B: ký tự chưa chọn
       currentIndex: 0,
-      countdownTime: 30,
+      timeLimit: 30,
       timeLeft: 0,
       timer: null,
       selectedResultIndex: null, // Vị trí được chọn trong Phần A
-      isAnswerCorrect: false,
+      resultMessage: '',
+      resultEmoji: '',
       correctAnswers: 0,
       totalQuestions: 0,
       predefinedVocabularies,
@@ -36,13 +37,34 @@ const app = Vue.createApp({
     };
   },
   computed: {
-    percentage() {
-      return this.totalQuestions === 0
-        ? 0
-        : Math.round((this.correctAnswers / this.totalQuestions) * 100);
+    accuracyPercentage() {
+      return this.currentQuestion === 1 ? 0 : ((this.correctCount / (this.currentQuestion - 1)) * 100).toFixed(0);
+    },
+
+    finalAccuracyPercentage() {
+      return this.currentQuestion === 1 ? 0 : ((this.correctCount / (this.currentQuestion)) * 100).toFixed(0);
     },
   },
   methods: {
+
+    getResponseTime() {
+      return this.timeLimit - this.remainingTime + 1
+    },
+    startTimer() {
+      this.remainingTime = this.timeLimit;
+      this.timer = setInterval(() => {
+        this.remainingTime--;
+        if (this.remainingTime <= 0) {
+          clearInterval(this.timer);
+          this.checkAnswer(true); // Tự động kiểm tra khi hết thời gian
+        }
+      }, 1000);
+    },
+    stopTimer() {
+      clearInterval(this.timer);
+      this.timer = null;
+    },
+
     // Thêm từ vựng từ bộ được chọn
     addPredefinedVocabulary() {
       if (this.selectedVocabulary) {
@@ -102,7 +124,7 @@ const app = Vue.createApp({
 
     startQuiz() {
       const words = this.vocabularyInput.split(",").map(word => word.trim()).filter(word => word);
-      if (words.length === 0 || this.countdownTime < 5) {
+      if (words.length === 0 || this.timeLimit < 5) {
         alert("Hãy nhập từ vựng hợp lệ!");
         return;
       }
@@ -111,7 +133,7 @@ const app = Vue.createApp({
       this.correctAnswers = 0;
       this.totalQuestions = 0;
       this.loadWord();
-      this.screen = 'quiz';
+      this.screenMode = 1;
       this.saveGameHistory(new Date().toISOString(), "", words.length, 0); // Lưu thời gian bắt đầu
     },
     loadWord() {
@@ -119,7 +141,7 @@ const app = Vue.createApp({
       this.resultArray = Array(this.currentWord.length).fill(''); // Tạo ô trống
       this.shuffledWord = this.shuffle(this.currentWord.split(''));
       this.selectedResultIndex = 0; // Mặc định chọn ô đầu tiên
-      this.timeLeft = this.countdownTime;
+      this.timeLeft = this.timeLimit;
       this.startTimer();
       console.log('this.currentWord', this.currentWord)
     },
@@ -183,15 +205,15 @@ const app = Vue.createApp({
       this.isAnswerCorrect = this.resultArray.join('') === this.currentWord;
       if (this.isAnswerCorrect) this.correctAnswers += 1;
       this.totalQuestions += 1;
-      this.screen = 'result';
+      this.screenMode = 2;
     },
     nextWord() {
       this.currentIndex += 1;
       this.loadWord();
-      this.screen = 'quiz';
+      this.screenMode = 1;
     },
     resetQuiz() {
-      this.screen = 'settings';
+      this.screenMode = 0;
     },
   },
 });
