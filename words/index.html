@@ -15,45 +15,47 @@
 
     <!-- Screen: Settings -->
     <div v-if="screen === 'settings'" class="settings-screen">
-      <h1>Thiết lập trò chơi</h1>
+      <h1 class="mb-4">Thiết lập trò chơi</h1>
 
-      <div>
-        <label>Danh sách từ vựng:</label>
-        <textarea v-model="vocabularyInput" rows="4" placeholder="Nhập từ vựng, cách nhau bằng dấu phẩy"></textarea>
+      <div class="mb-3">
+        <label for="vocabularyInput" class="form-label">Danh sách từ vựng:</label>
+        <textarea id="vocabularyInput" class="form-control" v-model="vocabularyInput" rows="4" placeholder="Nhập từ vựng, cách nhau bằng dấu phẩy"></textarea>
       </div>
 
-      <div>
-        <label>Thời gian cho mỗi câu (giây):</label>
-        <input type="number" v-model="countdownTime" min="5" />
+      <div class="mb-3">
+        <label for="countdownTime" class="form-label">Thời gian cho mỗi câu (giây):</label>
+        <input id="countdownTime" type="number" class="form-control" v-model="countdownTime" min="5" />
       </div>
 
-      <div>
-        <label>Chọn bộ từ vựng có sẵn:</label>
-        <select v-model="selectedVocabulary">
+      <div class="mb-3">
+        <label for="predefinedVocabularies" class="form-label">Chọn bộ từ vựng có sẵn:</label>
+        <select id="predefinedVocabularies" class="form-select" v-model="selectedVocabulary">
           <option v-for="vocab in predefinedVocabularies" :key="vocab.name" :value="vocab">
             {{ vocab.name }}
           </option>
         </select>
-        <button @click="addPredefinedVocabulary">Thêm</button>
+        <button class="btn btn-primary mt-2" @click="addPredefinedVocabulary">Thêm</button>
       </div>
 
-      <div>
-        <label>Bộ từ vựng của bạn:</label>
-        <select v-model="selectedUserVocabulary">
+      <div class="mb-3">
+        <label for="userVocabularies" class="form-label">Bộ từ vựng của bạn:</label>
+        <select id="userVocabularies" class="form-select" v-model="selectedUserVocabulary">
           <option v-for="vocab in userDefinedVocabularies" :key="vocab.name" :value="vocab">
             {{ vocab.name }}
           </option>
         </select>
-        <button @click="addUserVocabulary">Thêm</button>
-        <button @click="deleteSelectedUserVocabulary">Xóa</button>
+        <div class="mt-2">
+          <button class="btn btn-primary" @click="addUserVocabulary">Thêm</button>
+          <button class="btn btn-danger" @click="deleteSelectedUserVocabulary">Xóa</button>
+        </div>
       </div>
 
-      <div>
-        <input type="text" placeholder="Tên bộ từ vựng" v-model="newVocabularyName" />
-        <button @click="saveUserVocabulary(newVocabularyName)">Lưu bộ từ vựng</button>
+      <div class="mb-3">
+        <input type="text" class="form-control" placeholder="Tên bộ từ vựng" v-model="newVocabularyName" />
+        <button class="btn btn-success mt-2" @click="saveUserVocabulary(newVocabularyName)">Lưu bộ từ vựng</button>
       </div>
 
-      <button @click="startQuiz">Bắt đầu</button>
+      <button class="btn btn-primary" @click="startQuiz">Bắt đầu</button>
     </div>
 
     <!-- Screen: Quiz -->
