@@ -1,3 +1,17 @@
+const predefinedVocabularies = [
+  { name: "Anh văn lớp 1", words: ["apple", "banana", "cat", "dog"] },
+  { name: "Anh văn lớp 2", words: ["orange", "grape", "rabbit", "horse"] },
+  { name: "Anh văn lớp 3", words: ["tiger", "lion", "zebra", "elephant"] },
+];
+
+function saveToCookie(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function loadFromCookie(key) {
+  return JSON.parse(localStorage.getItem(key)) || [];
+}
+
 const app = Vue.createApp({
   data() {
     return {
@@ -15,6 +29,10 @@ const app = Vue.createApp({
       isAnswerCorrect: false,
       correctAnswers: 0,
       totalQuestions: 0,
+      predefinedVocabularies,
+      userDefinedVocabularies: loadFromCookie("userVocabularies"),
+      selectedVocabulary: null,
+      history: loadFromCookie("gameHistory").slice(0, 20),
     };
   },
   computed: {
@@ -25,20 +43,76 @@ const app = Vue.createApp({
     },
   },
   methods: {
-    startQuiz() {
-      this.vocabulary = this.vocabularyInput
-        .split(',')
-        .map(word => word.trim())
-        .filter(word => word);
-      if (this.vocabulary.length === 0 || this.countdownTime < 5) {
-        alert('Please provide valid input!');
+    // Thêm từ vựng từ bộ được chọn
+    addPredefinedVocabulary() {
+      if (this.selectedVocabulary) {
+        const selectedWords = this.selectedVocabulary.words.join(", ");
+        this.vocabularyInput = this.vocabularyInput
+          ? this.vocabularyInput + ", " + selectedWords
+          : selectedWords;
+      }
+    },
+    // Thêm từ vựng từ bộ được chọn (người dùng)
+    addUserVocabulary() {
+      if (this.selectedUserVocabulary) {
+        const selectedWords = this.selectedUserVocabulary.words.join(", ");
+        this.vocabularyInput = this.vocabularyInput
+          ? this.vocabularyInput + ", " + selectedWords
+          : selectedWords;
+      }
+    },
+    // Xóa bộ từ vựng người dùng đã chọn
+    deleteSelectedUserVocabulary() {
+      if (this.selectedUserVocabulary) {
+        const index = this.userDefinedVocabularies.findIndex(
+          (vocab) => vocab.name === this.selectedUserVocabulary.name
+        );
+        if (index !== -1) {
+          this.userDefinedVocabularies.splice(index, 1);
+          saveToCookie("userVocabularies", this.userDefinedVocabularies);
+          this.selectedUserVocabulary = null; // Xóa lựa chọn
+        }
+      }
+    },
+    saveUserVocabulary(name) {
+      if (!name) {
+        alert("Hãy đặt tên cho bộ từ vựng!");
         return;
       }
+      const newVocabulary = {
+        name,
+        words: this.vocabularyInput.split(",").map(word => word.trim()).filter(word => word),
+      };
+      this.userDefinedVocabularies.push(newVocabulary);
+      saveToCookie("userVocabularies", this.userDefinedVocabularies);
+      alert("Lưu thành công!");
+    },
+    // Xóa bộ từ vựng người dùng tạo
+    deleteUserVocabulary(index) {
+      this.userDefinedVocabularies.splice(index, 1);
+      saveToCookie("userVocabularies", this.userDefinedVocabularies);
+    },
+    // Lưu lịch sử trò chơi
+    saveGameHistory(startTime, endTime, wordCount, correct) {
+      const newRecord = { start_time: startTime, end_time: endTime, word_count: wordCount, correct };
+      this.history.unshift(newRecord);
+      this.history = this.history.slice(0, 20); // Giới hạn 20 bản ghi
+      saveToCookie("gameHistory", this.history);
+    },
+
+    startQuiz() {
+      const words = this.vocabularyInput.split(",").map(word => word.trim()).filter(word => word);
+      if (words.length === 0 || this.countdownTime < 5) {
+        alert("Hãy nhập từ vựng hợp lệ!");
+        return;
+      }
+      this.vocabulary = words;
+      this.currentIndex = 0;
       this.correctAnswers = 0;
       this.totalQuestions = 0;
-      this.currentIndex = 0;
       this.loadWord();
       this.screen = 'quiz';
+      this.saveGameHistory(new Date().toISOString(), "", words.length, 0); // Lưu thời gian bắt đầu
     },
     loadWord() {
       this.currentWord = this.vocabulary[this.currentIndex];
@@ -47,6 +121,24 @@ const app = Vue.createApp({
       this.selectedResultIndex = 0; // Mặc định chọn ô đầu tiên
       this.timeLeft = this.countdownTime;
       this.startTimer();
+      console.log('this.currentWord', this.currentWord)
+    },
+    checkAnswer() {
+      clearInterval(this.timer);
+      this.correctAnswers += this.currentWord === this.resultArray.join("") ? 1 : 0;
+      this.totalQuestions += 1;
+      this.currentIndex += 1;
+      if (this.currentIndex < this.vocabulary.length) {
+        this.loadWord();
+      } else {
+        this.saveGameHistory(
+          this.history[0].start_time,
+          new Date().toISOString(),
+          this.vocabulary.length,
+          this.correctAnswers
+        );
+        this.screen = 'result';
+      }
     },
     shuffle(array) {
       return array.sort(() => Math.random() - 0.5);

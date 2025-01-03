@@ -5,62 +5,80 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Learn English</title>
+  <link href="bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <div id="app">
+  <div id="app" class="container">
     <h1>Learn English Vocabulary</h1>
 
     <!-- Screen: Settings -->
-    <div v-if="screen === 'settings'">
-      <h2>Settings</h2>
-      <label>
-        Vocabulary List (comma separated):
-        <input v-model="vocabularyInput" placeholder="e.g., example, learning, vocabulary">
-      </label>
-      <br>
-      <label>
-        Countdown Time (seconds):
-        <input type="number" v-model.number="countdownTime" min="5">
-      </label>
-      <br>
-      <button @click="startQuiz">Start Quiz</button>
+    <div v-if="screen === 'settings'" class="settings-screen">
+      <h1>Thiết lập trò chơi</h1>
+
+      <div>
+        <label>Danh sách từ vựng:</label>
+        <textarea v-model="vocabularyInput" rows="4" placeholder="Nhập từ vựng, cách nhau bằng dấu phẩy"></textarea>
+      </div>
+
+      <div>
+        <label>Thời gian cho mỗi câu (giây):</label>
+        <input type="number" v-model="countdownTime" min="5" />
+      </div>
+
+      <div>
+        <label>Chọn bộ từ vựng có sẵn:</label>
+        <select v-model="selectedVocabulary">
+          <option v-for="vocab in predefinedVocabularies" :key="vocab.name" :value="vocab">
+            {{ vocab.name }}
+          </option>
+        </select>
+        <button @click="addPredefinedVocabulary">Thêm</button>
+      </div>
+
+      <div>
+        <label>Bộ từ vựng của bạn:</label>
+        <select v-model="selectedUserVocabulary">
+          <option v-for="vocab in userDefinedVocabularies" :key="vocab.name" :value="vocab">
+            {{ vocab.name }}
+          </option>
+        </select>
+        <button @click="addUserVocabulary">Thêm</button>
+        <button @click="deleteSelectedUserVocabulary">Xóa</button>
+      </div>
+
+      <div>
+        <input type="text" placeholder="Tên bộ từ vựng" v-model="newVocabularyName" />
+        <button @click="saveUserVocabulary(newVocabularyName)">Lưu bộ từ vựng</button>
+      </div>
+
+      <button @click="startQuiz">Bắt đầu</button>
     </div>
 
     <!-- Screen: Quiz -->
     <div v-if="screen === 'quiz'" class="quiz-screen">
       <div class="timer">Time left: {{ timeLeft }} seconds</div>
-    
+
       <!-- Phần A: Kết quả -->
       <div class="result-area">
-        <div
-          v-for="(char, index) in resultArray"
-          :key="index"
-          class="result-box"
-          :class="{ selected: selectedResultIndex === index }"
-          @click="selectFromResult(index)"
-        >
+        <div v-for="(char, index) in resultArray" :key="index" class="result-box"
+          :class="{ selected: selectedResultIndex === index }" @click="selectFromResult(index)">
           {{ char || ' ' }}
         </div>
       </div>
-    
+
       <!-- Phần B: Ký tự lộn xộn -->
       <div class="shuffled-area">
-        <div
-          v-for="(char, index) in shuffledWord"
-          :key="index"
-          class="shuffled-box"
-          @click="selectFromShuffled(index)"
-        >
+        <div v-for="(char, index) in shuffledWord" :key="index" class="shuffled-box" @click="selectFromShuffled(index)">
           {{ char }}
         </div>
       </div>
-    
+
       <button @click="checkAnswer">Check Answer</button>
     </div>
-    
-    
+
+
 
     <!-- Screen: Result -->
     <div v-if="screen === 'result'">
