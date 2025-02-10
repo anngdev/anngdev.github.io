@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Crop Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+        }
+        .iframe-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        iframe {
+            position: absolute;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="iframe-container">
+        <iframe id="iframe" src="about:blank"></iframe>
+    </div>
+    
+    <script>
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                col: parseInt(params.get('col') || '1'),
+                row: parseInt(params.get('row') || '1'),
+                icol: parseInt(params.get('icol') || '0'),
+                irow: parseInt(params.get('irow') || '0'),
+                url: params.get('url') || 'https://example.com'
+            };
+        }
+
+        function updateIframeView() {
+            const iframe = document.getElementById("iframe");
+            const params = getQueryParams();
+            
+            // Tính toán kích thước từng phần
+            const widthPercent = 100 / params.col;
+            const heightPercent = 100 / params.row;
+            const xOffset = widthPercent * params.icol;
+            const yOffset = heightPercent * params.irow;
+            
+            // Tính toán viewport scale để iframe full màn hình
+            const scaleX = 100 / widthPercent;
+            const scaleY = 100 / heightPercent;
+            
+            iframe.style.width = `${scaleX * 100}%`;
+            iframe.style.height = `${scaleY * 100}%`;
+            iframe.style.left = `-${xOffset * scaleX}%`;
+            iframe.style.top = `-${yOffset * scaleY}%`;
+            
+            // Load URL vào iframe
+            iframe.src = params.url;
+        }
+        
+        updateIframeView();
+    </script>
+</body>
+</html>
