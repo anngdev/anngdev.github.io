@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Crop Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+        }
+        .video-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        video {
+            position: absolute;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video id="video" src="media/video_123.mp4" muted loop></video>
+    </div>
+    
+    <script>
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                col: parseInt(params.get('col') || '1'),
+                row: parseInt(params.get('row') || '1'),
+                icol: parseInt(params.get('icol') || '0'),
+                irow: parseInt(params.get('irow') || '0'),
+                timestamp: parseFloat(params.get('timestamp') || '0')
+            };
+        }
+
+        function updateVideoView() {
+            const video = document.getElementById("video");
+            const params = getQueryParams();
+            
+            // Tính toán kích thước từng phần
+            const widthPercent = 100 / params.col;
+            const heightPercent = 100 / params.row;
+            const xOffset = widthPercent * params.icol;
+            const yOffset = heightPercent * params.irow;
+            
+            // Tính toán viewport scale để video full màn hình
+            const scaleX = 100 / widthPercent;
+            const scaleY = 100 / heightPercent;
+            
+            video.style.width = `${scaleX * 100}%`;
+            video.style.height = `${scaleY * 100}%`;
+            video.style.left = `-${xOffset * scaleX}%`;
+            video.style.top = `-${yOffset * scaleY}%`;
+            
+            // Đợi đến đúng timestamp mới phát video
+            const currentTimeStamp = Math.floor(Date.now()); // Lấy timestamp hiện tại (giây)
+            const startTimeStap = params.timestamp * 1000
+            const delay = startTimeStap - currentTimeStamp;
+            console.log("currentTimeStamp", currentTimeStamp)
+            console.log("startTimeStap   ", startTimeStap)
+            console.log("delay", delay)
+            
+            if (delay > 0) {
+                setTimeout(() => {
+                    video.play();
+                }, delay);
+            } else {
+                video.play();
+            }
+        }
+        
+        const video = document.getElementById("video");
+        video.addEventListener("loadedmetadata", updateVideoView);
+    </script>
+</body>
+</html>
