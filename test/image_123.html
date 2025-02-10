@@ -22,8 +22,6 @@
         }
         img {
             position: absolute;
-            width: 100%;
-            height: 100%;
             object-fit: cover;
         }
     </style>
@@ -48,13 +46,20 @@
             const img = document.getElementById("image");
             const params = getQueryParams();
             
-            // Tính toán vị trí crop
+            // Tính toán kích thước từng phần
             const widthPercent = 100 / params.col;
             const heightPercent = 100 / params.row;
             const xOffset = widthPercent * params.icol;
             const yOffset = heightPercent * params.irow;
             
-            img.style.clipPath = `inset(${yOffset}% ${100 - (xOffset + widthPercent)}% ${100 - (yOffset + heightPercent)}% ${xOffset}%)`;
+            // Tính toán viewport scale để hình ảnh full màn hình
+            const scaleX = 100 / widthPercent;
+            const scaleY = 100 / heightPercent;
+            
+            img.style.width = `${scaleX * 100}%`;
+            img.style.height = `${scaleY * 100}%`;
+            img.style.left = `-${xOffset * scaleX}%`;
+            img.style.top = `-${yOffset * scaleY}%`;
         }
         
         updateImageView();
