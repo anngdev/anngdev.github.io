@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube IFrame Crop Viewer</title>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+        }
+        .iframe-container {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #player {
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <div class="iframe-container">
+        <div id="player"></div>
+    </div>
+    
+    <script>
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                videoId: params.get('videoId') || 'JNVY8mTeD-Y', // Default video ID
+                col: parseInt(params.get('col') || '1'),
+                row: parseInt(params.get('row') || '1'),
+                icol: parseInt(params.get('icol') || '0'),
+                irow: parseInt(params.get('irow') || '0'),
+                timestamp: parseInt(params.get('timestamp') || '0'),
+                startTime: parseInt(params.get('startTime') || '0')
+            };
+        }
+
+        function adjustVideoSize() {
+            const params = getQueryParams();
+            const playerElement = document.getElementById('player');
+
+            const scaleX = params.col;
+            const scaleY = params.row;
+            const offsetX = params.icol;
+            const offsetY = params.irow;
+            
+            const widthScale = 100 * scaleX;
+            const heightScale = 100 * scaleY;
+            const leftOffset = -(offsetX * 100);
+            const topOffset = -(offsetY * 100);
+            
+            playerElement.style.width = `${widthScale}vw`;
+            playerElement.style.height = `${heightScale}vh`;
+            playerElement.style.left = `${leftOffset}vw`;
+            playerElement.style.top = `${topOffset}vh`;
+        }
+
+        let player;
+        function onYouTubeIframeAPIReady() {
+            const params = getQueryParams();
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                videoId: params.videoId,
+                playerVars: {
+                    autoplay: 1, // Bật autoplay nhưng cần xử lý chính xác để tránh bị block
+                    controls: 0,
+                    showinfo: 0,
+                    modestbranding: 1,
+                    loop: 1,
+                    playlist: params.videoId,
+                    start: params.startTime || 0,
+                    mute: 1 // Mute để tránh chặn autoplay
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            adjustVideoSize();
+            const params = getQueryParams();
+            const currentTime = Math.floor(Date.now() / 1000);
+            const delay = params.timestamp - currentTime;
+
+            if (delay > 0) {
+                console.log(`Video sẽ phát sau ${delay} giây`);
+                setTimeout(() => {
+                    console.log("Bắt đầu phát video");
+                    player.unMute(); // Bật âm thanh trở lại
+                    player.playVideo();
+                }, delay * 1000);
+            } else {
+                console.log("Phát video ngay lập tức");
+                player.unMute(); // Bật âm thanh trở lại
+                player.playVideo();
+            }
+        }
+    </script>
+</body>
+</html>
