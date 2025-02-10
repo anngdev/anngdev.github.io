@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Crop Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+        }
+        .image-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <img id="image" src="images/image_123.jpg" alt="Image">
+    </div>
+    
+    <script>
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                col: parseInt(params.get('col') || '1'),
+                row: parseInt(params.get('row') || '1'),
+                icol: parseInt(params.get('icol') || '0'),
+                irow: parseInt(params.get('irow') || '0')
+            };
+        }
+
+        function updateImageView() {
+            const img = document.getElementById("image");
+            const params = getQueryParams();
+            
+            // Tính toán vị trí crop
+            const widthPercent = 100 / params.col;
+            const heightPercent = 100 / params.row;
+            const xOffset = widthPercent * params.icol;
+            const yOffset = heightPercent * params.irow;
+            
+            img.style.clipPath = `inset(${yOffset}% ${100 - (xOffset + widthPercent)}% ${100 - (yOffset + heightPercent)}% ${xOffset}%)`;
+        }
+        
+        updateImageView();
+    </script>
+</body>
+</html>
