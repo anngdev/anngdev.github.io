@@ -129,7 +129,7 @@ createApp({
                 this.maxIncorrectStreak = Math.max(this.maxIncorrectStreak, this.incorrectStreak);
 
                 document.getElementById("incorrect").play();
-                this.resultMessage = timeout ? `Hết giờ! Đáp án đúng là: ${this.correctAnswer}.` : `Sai! Đáp án đúng là: ${this.correctAnswer}.`;
+                this.resultMessage = timeout ? `Hết giờ! Đáp án đúng là: ${this.question} ${this.correctAnswer}.` : `Sai! Đáp án đúng là: ${this.question} ${this.correctAnswer}.`;
                 document.body.style.backgroundColor = '#faf3de';
                 this.resultEmoji = this.getSuccessEmoji(false);
             }
