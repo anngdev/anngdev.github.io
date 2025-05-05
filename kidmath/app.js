@@ -5,6 +5,7 @@ createApp({
         return {
             screenMode: 0,
             minLimit: 1,
+            stableNumber: null,
             maxLimit: 100,
             allowNegativeResults: false,
             operations: ['+', '−', '×', '÷'],
@@ -70,6 +71,9 @@ createApp({
             do {
                 this.num1 = Math.floor(Math.random() * (this.maxLimit - this.minLimit + 1)) + this.minLimit;
                 this.num2 = Math.floor(Math.random() * (this.maxLimit - this.minLimit + 1)) + this.minLimit;
+                if (this.stableNumber){
+                    this.num2 = this.stableNumber;
+                }
 
                 const operation = this.selectedOperations[Math.floor(Math.random() * this.selectedOperations.length)];
 

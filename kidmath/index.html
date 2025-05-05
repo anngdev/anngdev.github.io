@@ -84,6 +84,16 @@
                         </div>
                     </div>
                 </div>
+                
+
+                <div class="row  mb-3">
+                    <div class="col">
+                        <label class="form-label">Số hạng giữ nguyên:</label>
+                    </div>
+                    <div class="col">
+                        <input type="number" v-model.number="stableNumber" class="form-control" step="1">
+                    </div>
+                </div>
             </div>
             <button class="btn btn-secondary big-button" @click="startGame">Bắt đầu</button>
         </div>
